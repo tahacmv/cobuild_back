@@ -9,5 +9,6 @@ public class RegisterRequestModel {
 
     String username;
     String password;
-    String Role;
+    String email;
+    String roleName;
 }
