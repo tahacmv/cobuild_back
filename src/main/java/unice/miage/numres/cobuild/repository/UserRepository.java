@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import unice.miage.numres.cobuild.model.User;
+import unice.miage.numres.cobuild.model.Utilisateur;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
-    Optional<User> findByUsername(String username);
+public interface UserRepository extends JpaRepository<Utilisateur, String> {
+    Optional<Utilisateur> findByUsername(String username);
 }
