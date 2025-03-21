@@ -26,7 +26,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Allow all endpoints in /auth/
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/projects/**").hasAnyRole("ADMIN", "PORTEURDEPROJET")
+                        .requestMatchers("/travailleurs/**").hasAnyRole("ADMIN", "TRAVAILLEUR")
                         .anyRequest().authenticated() // Protect all other routes
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
