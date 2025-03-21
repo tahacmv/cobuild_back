@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootApplication
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "unice.miage.numres.cobuild.repository")
 public class CobuildApplication {
 
 	public static void main(String[] args) {
