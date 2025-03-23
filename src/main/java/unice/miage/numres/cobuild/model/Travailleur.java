@@ -22,9 +22,6 @@ public class Travailleur extends Utilisateur {
     @ElementCollection
     private List<String> competences;
 
-    @OneToMany(mappedBy = "travailleur", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Candidature> candidatures;
-
     @ManyToMany(mappedBy = "volontaires")
     @JsonIgnore
     private List<Projet> projetsVolontaires;
