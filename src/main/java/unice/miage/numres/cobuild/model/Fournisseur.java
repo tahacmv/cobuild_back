@@ -2,6 +2,9 @@ package unice.miage.numres.cobuild.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -16,5 +19,6 @@ import lombok.Setter;
 public class Fournisseur extends Utilisateur {
 
     @OneToMany(mappedBy = "fournisseur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Materiel> materiels;
 }

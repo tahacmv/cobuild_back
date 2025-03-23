@@ -2,6 +2,8 @@ package unice.miage.numres.cobuild.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
@@ -13,12 +15,18 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "materiels")
+@Table(name = "materiel")
 public class Materiel extends AbstractBaseEntity {
     String nom;
     String description;
 
     @ManyToOne
     @JoinColumn(name = "fournisseur_id", nullable = false)
+    @JsonBackReference
     private Fournisseur fournisseur;
+
+    @ManyToOne
+    @JoinColumn(name = "projet_id")
+    @JsonBackReference
+    private Projet projet;
 }

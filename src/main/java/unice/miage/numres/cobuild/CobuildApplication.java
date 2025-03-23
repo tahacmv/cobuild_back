@@ -2,12 +2,14 @@ package unice.miage.numres.cobuild;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "unice.miage.numres.cobuild.repository")
+@EntityScan(basePackages = "unice.miage.numres.cobuild.model")
 public class CobuildApplication {
 
 	public static void main(String[] args) {

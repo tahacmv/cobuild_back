@@ -41,4 +41,8 @@ public class Projet extends AbstractBaseEntity {
         inverseJoinColumns = @JoinColumn(name = "travailleur_id")
     )
     private List<Travailleur> volontaires;
+
+    @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Materiel> materiels;
 }
