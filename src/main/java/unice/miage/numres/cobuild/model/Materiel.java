@@ -22,11 +22,11 @@ public class Materiel extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "fournisseur_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference(value="materiel-fournisseur")
     private Fournisseur fournisseur;
 
     @ManyToOne
     @JoinColumn(name = "projet_id")
-    @JsonBackReference
+    @JsonBackReference(value="materiel-projet")
     private Projet projet;
 }

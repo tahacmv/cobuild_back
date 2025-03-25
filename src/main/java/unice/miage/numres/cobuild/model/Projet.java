@@ -24,6 +24,8 @@ public class Projet extends AbstractBaseEntity {
     private String nom;
     private String description;
     private String statut;
+    private boolean archived = false;
+
 
     @ManyToOne
     @JoinColumn(name = "porteur_id", nullable = false)
@@ -31,18 +33,14 @@ public class Projet extends AbstractBaseEntity {
     private PorteurDeProjet porteurDeProjet;
 
     @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value="projet-taches")
     private List<Tache> taches;
-
-    @ManyToMany
-    @JoinTable(
-        name = "projet_volunteers",
-        joinColumns = @JoinColumn(name = "projet_id"),
-        inverseJoinColumns = @JoinColumn(name = "travailleur_id")
-    )
-    private List<Travailleur> volontaires;
+    
+    @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL)
+    @JsonManagedReference(value="projet-poste")
+    private List<Poste> postes;
 
     @OneToMany(mappedBy = "projet", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value="materiel-projet")
     private List<Materiel> materiels;
 }

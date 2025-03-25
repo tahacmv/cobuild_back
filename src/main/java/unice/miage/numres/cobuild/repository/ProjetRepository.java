@@ -13,8 +13,11 @@ public interface ProjetRepository extends JpaRepository<Projet, String> {
     // Retrieve all projects created by a specific PorteurDeProjet (filtered by username)
     List<Projet> findByPorteurDeProjetUsername(String username);
 
-    List<Projet> findByVolontairesContaining(Travailleur travailleur);
+    List<Projet> findByPorteurDeProjetUsernameAndStatutContainingIgnoreCaseAndNomContainingIgnoreCase(
+        String username, String statut, String nom);
 
     List<Projet> findByStatutNot(String statut);
+
+    List<Projet> findByArchivedFalseAndStatutNot(String string);
 
 }

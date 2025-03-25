@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/travailleurs/**").hasAnyRole("ADMIN", "TRAVAILLEUR")
                         .requestMatchers("/fournisseurs/**").hasAnyRole("ADMIN", "FOURNISSEUR")
                         .requestMatchers("/messages/**").hasAnyRole("ADMIN", "FOURNISSEUR", "PORTEURDEPROJET", "TRAVAILLEUR")
+                        .requestMatchers("/candidatures/**").hasAnyRole("ADMIN", "PORTEURDEPROJET", "TRAVAILLEUR")
                         .anyRequest().authenticated() // Protect all other routes
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

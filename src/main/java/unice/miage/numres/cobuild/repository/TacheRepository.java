@@ -16,7 +16,7 @@ public interface TacheRepository extends JpaRepository<Tache, String> {
     List<Tache> findByProjetId(String projetId);
     
     // Retrieve tasks that are not yet assigned to a travailleur
-    List<Tache> findByTravailleurIsNull();
+    List<Tache> findByTravailleursIsEmpty();
 
-    List<Tache> findTachesByTravailleur(Travailleur travailleur);
+    List<Tache> findByTravailleurs(Travailleur travailleur);
 }

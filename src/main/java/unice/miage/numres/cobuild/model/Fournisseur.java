@@ -19,6 +19,6 @@ import lombok.Setter;
 public class Fournisseur extends Utilisateur {
 
     @OneToMany(mappedBy = "fournisseur", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value="materiel-fournisseur")
     private List<Materiel> materiels;
 }

@@ -7,18 +7,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import unice.miage.numres.cobuild.model.Etape;
+import unice.miage.numres.cobuild.model.Poste;
 import unice.miage.numres.cobuild.model.Projet;
 import unice.miage.numres.cobuild.model.Tache;
+import unice.miage.numres.cobuild.model.Travailleur;
 import unice.miage.numres.cobuild.services.TravailleurService;
+import unice.miage.numres.cobuild.util.StatutEtape;
 
 @RestController
 @RequestMapping("/travailleurs")
@@ -27,49 +31,55 @@ public class TravailleurController {
 
     @Autowired
     private final TravailleurService travailleurService;
+    // === Profil ===
 
-    @GetMapping("/projects/available")
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('TRAVAILLEUR')")
+    public ResponseEntity<Travailleur> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(travailleurService.getProfile(userDetails.getUsername()));
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasRole('TRAVAILLEUR')")
+    public ResponseEntity<Travailleur> updateProfile(
+            @RequestBody Travailleur updated,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(travailleurService.updateProfile(userDetails.getUsername(), updated));
+    }
+
+    // === Navigation & Recherche ===
+
+    @GetMapping("/projects")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
     public ResponseEntity<List<Projet>> getAvailableProjects() {
         return ResponseEntity.ok(travailleurService.getAvailableProjects());
     }
 
-    @GetMapping("/projects/mine")
+    @GetMapping("/projects/{projectId}/postes")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
-    public ResponseEntity<List<Projet>> getMyVolunteeredProjects(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(travailleurService.getVolunteeredProjects(userDetails.getUsername()));
+    public ResponseEntity<List<Poste>> getOpenPostesInProject(@PathVariable String projectId) {
+        return ResponseEntity.ok(travailleurService.getOpenPostesInProject(projectId));
     }
 
-    @GetMapping("/tasks/assigned")
+    @GetMapping("/postes/search")
+    @PreAuthorize("hasRole('TRAVAILLEUR')")
+    public ResponseEntity<List<Poste>> searchPostesByCompetence(@RequestParam String keyword) {
+        return ResponseEntity.ok(travailleurService.searchPostesByCompetence(keyword));
+    }
+
+    // === Tâches & Étapes ===
+
+    @GetMapping("/tasks")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
     public ResponseEntity<List<Tache>> getAssignedTasks(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(travailleurService.getAssignedTasks(userDetails.getUsername()));
     }
 
-    @PostMapping("/volunteer/{projectId}")
+    @PutMapping("/etapes/{etapeId}/status")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
-    public ResponseEntity<String> volunteerForProject(
-            @PathVariable String projectId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        travailleurService.volunteerForProject(userDetails.getUsername(), projectId);
-        return ResponseEntity.ok("You have successfully volunteered for the project.");
-    }
-
-    @PutMapping("/tasks/{taskId}/complete")
-    @PreAuthorize("hasRole('TRAVAILLEUR')")
-    public ResponseEntity<Tache> completeTask(
-            @PathVariable String taskId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(travailleurService.completeTask(taskId, userDetails.getUsername()));
-    }
-
-    @DeleteMapping("/projects/{projectId}/withdraw")
-    @PreAuthorize("hasRole('TRAVAILLEUR')")
-    public ResponseEntity<String> withdrawFromProject(
-            @PathVariable String projectId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        travailleurService.withdrawFromProject(userDetails.getUsername(), projectId);
-        return ResponseEntity.ok("Successfully withdrawn from the project.");
+    public ResponseEntity<Etape> updateEtapeStatut(
+            @PathVariable String etapeId,
+            @RequestParam StatutEtape statut) {
+        return ResponseEntity.ok(travailleurService.updateEtapeStatut(etapeId, statut));
     }
 }
