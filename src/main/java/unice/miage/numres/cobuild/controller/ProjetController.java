@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import unice.miage.numres.cobuild.model.Etape;
 import unice.miage.numres.cobuild.model.Poste;
@@ -18,6 +19,7 @@ import unice.miage.numres.cobuild.services.ProjetService;
 
 import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/projects")
@@ -139,15 +141,6 @@ public class ProjetController {
         return ResponseEntity.ok(projetService.getStepsByTask(taskId, userDetails.getUsername()));
     }
 
-    @DeleteMapping("/tasks/steps/{stepId}")
-    @PreAuthorize("hasRole('PORTEURDEPROJET')")
-    public ResponseEntity<Void> removeStepFromTask(
-            @PathVariable String stepId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        projetService.removeStepFromTask(stepId, userDetails.getUsername());
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/tasks/{taskId}/completion")
     public ResponseEntity<Double> getTaskCompletionPercentage(@PathVariable String taskId) {
         return ResponseEntity.ok(projetService.getTaskCompletionPercentage(taskId));
@@ -196,4 +189,72 @@ public class ProjetController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(projetService.getTravailleursInProject(projectId, userDetails.getUsername()));
     }
+
+    @PutMapping("/{projectId}/upload-image")
+    @PreAuthorize("hasAuthority('PORTEURDEPROJET')")
+    public ResponseEntity<String> putMethodName(
+        @PathVariable String projectId,
+        @RequestParam("file") MultipartFile file,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        projetService.uploadProjectImage(userDetails.getUsername(), projectId, file);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/tasks/{taskId}")
+    @PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+    public ResponseEntity<Tache> updateTask(
+            @PathVariable String taskId,
+            @RequestBody Tache updatedTask,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        return ResponseEntity.ok(projetService.updateTask(taskId, updatedTask, user.getUsername()));
+    }
+
+    @PutMapping("/tasks/steps/{stepId}")
+    @PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+    public ResponseEntity<Etape> updateEtape(
+            @PathVariable String stepId,
+            @RequestBody Etape updated,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        return ResponseEntity.ok(projetService.updateEtape(stepId, updated, user.getUsername()));
+    }
+
+    @PutMapping("/postes/{posteId}")
+    @PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+    public ResponseEntity<Poste> updatePoste(
+            @PathVariable String posteId,
+            @RequestBody Poste updated,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        return ResponseEntity.ok(projetService.updatePoste(posteId, updated, user.getUsername()));
+    }
+
+    @DeleteMapping("/postes/{posteId}")
+@PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+public ResponseEntity<Void> deletePoste(
+        @PathVariable String posteId,
+        @AuthenticationPrincipal UserDetails user) {
+    projetService.deletePoste(posteId, user.getUsername());
+    return ResponseEntity.noContent().build();
+}
+
+@DeleteMapping("/tasks/steps/{stepId}")
+@PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+public ResponseEntity<Void> deleteEtape(
+        @PathVariable String stepId,
+        @AuthenticationPrincipal UserDetails user) {
+    projetService.deleteStep(stepId, user.getUsername());
+    return ResponseEntity.noContent().build();
+}
+
+@DeleteMapping("/tasks/{taskId}")
+@PreAuthorize("hasRole('PORTEURDEPROJET') or hasRole('ADMIN')")
+public ResponseEntity<Void> deleteTask(
+        @PathVariable String taskId,
+        @AuthenticationPrincipal UserDetails user) {
+    projetService.deleteTask(taskId, user.getUsername());
+    return ResponseEntity.noContent().build();
+}
+
 }

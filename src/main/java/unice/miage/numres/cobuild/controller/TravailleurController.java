@@ -55,6 +55,12 @@ public class TravailleurController {
         return ResponseEntity.ok(travailleurService.getAvailableProjects());
     }
 
+    @GetMapping("/projects/{projectId}")
+    @PreAuthorize("hasRole('TRAVAILLEUR')")
+    public ResponseEntity<Projet> getProjectById(@PathVariable String projectId) {
+        return ResponseEntity.ok(travailleurService.getProjectById(projectId));
+    }
+
     @GetMapping("/projects/{projectId}/postes")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
     public ResponseEntity<List<Poste>> getOpenPostesInProject(@PathVariable String projectId) {
@@ -64,7 +70,7 @@ public class TravailleurController {
     @GetMapping("/postes/search")
     @PreAuthorize("hasRole('TRAVAILLEUR')")
     public ResponseEntity<List<Poste>> searchPostesByCompetence(@RequestParam String keyword) {
-        return ResponseEntity.ok(travailleurService.searchPostesByCompetence(keyword));
+        return ResponseEntity.ok(travailleurService.searchPostes(keyword));
     }
 
     // === Tâches & Étapes ===
@@ -82,4 +88,18 @@ public class TravailleurController {
             @RequestParam StatutEtape statut) {
         return ResponseEntity.ok(travailleurService.updateEtapeStatut(etapeId, statut));
     }
+
+    @GetMapping("/projects/nearby")
+    public ResponseEntity<List<Projet>> getNearbyProjects(
+            @RequestParam String address,
+            @RequestParam(defaultValue = "10") double radiusKm) {
+        return ResponseEntity.ok(travailleurService.findProjectsNearAddress(address, radiusKm));
+    }
+
+    @GetMapping("/projects/search")
+    @PreAuthorize("hasRole('TRAVAILLEUR')")
+    public ResponseEntity<List<Projet>> searchProjectsByKeyword(@RequestParam String keyword) {
+        return ResponseEntity.ok(travailleurService.searchProjectsByKeyword(keyword));
+    }
+    
 }

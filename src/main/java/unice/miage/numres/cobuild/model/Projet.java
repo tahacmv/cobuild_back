@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -25,6 +26,13 @@ public class Projet extends AbstractBaseEntity {
     private String description;
     private String statut;
     private boolean archived = false;
+    @Column(name = "image_url")
+    private String imageUrl;
+    @Column
+    private Double latitude;
+    @Column
+    private Double longitude;
+    private String adresse;
 
 
     @ManyToOne

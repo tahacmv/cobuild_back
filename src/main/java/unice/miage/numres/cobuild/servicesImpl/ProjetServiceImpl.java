@@ -3,7 +3,9 @@ package unice.miage.numres.cobuild.servicesImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import io.jsonwebtoken.io.IOException;
 import unice.miage.numres.cobuild.model.Etape;
 import unice.miage.numres.cobuild.model.PorteurDeProjet;
 import unice.miage.numres.cobuild.model.Poste;
@@ -16,6 +18,7 @@ import unice.miage.numres.cobuild.repository.PosteRepository;
 import unice.miage.numres.cobuild.repository.ProjetRepository;
 import unice.miage.numres.cobuild.repository.TacheRepository;
 import unice.miage.numres.cobuild.repository.TravailleurRepository;
+import unice.miage.numres.cobuild.requestModel.GeoCodeResult;
 import unice.miage.numres.cobuild.services.ProjetService;
 import unice.miage.numres.cobuild.util.StatutEtape;
 
@@ -35,11 +38,19 @@ public class ProjetServiceImpl implements ProjetService {
     private final TravailleurRepository travailleurRepository;
     private final PosteRepository posteRepository;
     private final EtapeRepository etapeRepository;
+    private final FileStorageService fileStorageService;
+    private final GeoCodingService geocodingService;
 
     @Override
     public Projet createProject(Projet projet, String username) {
         PorteurDeProjet porteur = porteurDeProjetRepository.findByUsername(username)
         .orElseThrow(() -> new RuntimeException("Porteur de projet non trouvé"));
+
+        if (projet.getAdresse() != null) {
+            GeoCodeResult location = geocodingService.geocodeAddress(projet.getAdresse());
+            projet.setLatitude(location.getLatitude());
+            projet.setLongitude(location.getLongitude());
+        }
 
         projet.setPorteurDeProjet(porteur);
         return projetRepository.save(projet);
@@ -201,20 +212,7 @@ public List<Etape> getStepsByTask(String taskId, String username) {
 
     return etapeRepository.findByTacheId(taskId);
 }
-@Override
-public void removeStepFromTask(String stepId, String username) {
-    Etape etape = etapeRepository.findById(stepId)
-        .orElseThrow(() -> new RuntimeException("Étape non trouvée"));
 
-    Tache tache = etape.getTache();
-    Projet projet = tache.getProjet();
-
-    if (!projet.getPorteurDeProjet().getUsername().equals(username)) {
-        throw new AccessDeniedException("Vous ne pouvez modifier que vos propres projets.");
-    }
-
-    etapeRepository.delete(etape);
-}
     @Override
     public Poste addPosteToProject(String projectId, Poste poste, String username) {
         Projet projet = projetRepository.findById(projectId)
@@ -288,6 +286,105 @@ public void removeStepFromTask(String stepId, String username) {
                 .map(Poste::getTravailleur)
                 .filter(Objects::nonNull) // Only include filled posts
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void uploadProjectImage(String username, String projectId, MultipartFile image) throws IOException {
+        Projet projet = projetRepository.findById(projectId)
+        .orElseThrow(() -> new RuntimeException("Projet non trouvé"));
+
+        if (!projet.getPorteurDeProjet().getUsername().equals(username)) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que vos projets.");
+        }
+
+        String fileName = fileStorageService.saveFile(image, "projects");
+
+        projet.setImageUrl("/uploads/projects/" + fileName);
+        projetRepository.save(projet);
+    }
+    @Override
+    public Tache updateTask(String taskId, Tache updatedTask, String username) {
+        Tache task = tacheRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Tâche non trouvée"));
+    
+        // Check ownership
+        if (!task.getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que vos propres tâches.");
+        }
+    
+        task.setNom(updatedTask.getNom());
+        task.setDescription(updatedTask.getDescription());
+        task.setStatut(updatedTask.getStatut());
+    
+        return tacheRepository.save(task);
+    }
+
+    @Override
+    public Etape updateEtape(String etapeId, Etape updated, String username) {
+        Etape etape = etapeRepository.findById(etapeId)
+                .orElseThrow(() -> new RuntimeException("Étape non trouvée"));
+
+        // Only task owner can update
+        if (!etape.getTache().getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que vos propres étapes.");
+        }
+
+        etape.setNom(updated.getNom());
+        etape.setStatut(updated.getStatut());
+        return etapeRepository.save(etape);
+    }
+
+    @Override
+    public Poste updatePoste(String posteId, Poste updated, String username) {
+        Poste poste = posteRepository.findById(posteId)
+                .orElseThrow(() -> new RuntimeException("Poste non trouvé"));
+
+        if (!poste.getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+            throw new AccessDeniedException("Vous ne pouvez modifier que vos propres postes.");
+        }
+
+        poste.setTitre(updated.getTitre());
+        poste.setDescription(updated.getDescription());
+        poste.setCompetencesRequises(updated.getCompetencesRequises());
+        poste.setSalaire(updated.getSalaire());
+
+        return posteRepository.save(poste);
+    }
+
+    @Override
+    public void deletePoste(String posteId, String username) {
+        Poste poste = posteRepository.findById(posteId)
+        .orElseThrow(() -> new RuntimeException("Poste non trouvé"));
+
+        if (!poste.getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+            throw new AccessDeniedException("Vous ne pouvez supprimer que vos propres postes.");
+        }
+
+        posteRepository.delete(poste);
+    }
+
+    @Override
+    public void deleteTask(String taskId, String username) {
+            Tache task = tacheRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Tâche non trouvée"));
+
+    if (!task.getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+        throw new AccessDeniedException("Vous ne pouvez supprimer que vos propres tâches.");
+    }
+
+    tacheRepository.delete(task);
+    }
+
+    @Override
+    public void deleteStep(String stepId, String username) {
+        Etape etape = etapeRepository.findById(stepId)
+        .orElseThrow(() -> new RuntimeException("Étape non trouvée"));
+
+if (!etape.getTache().getProjet().getPorteurDeProjet().getUsername().equals(username)) {
+    throw new AccessDeniedException("Vous ne pouvez supprimer que vos propres étapes.");
+}
+
+etapeRepository.delete(etape);
     }
 
 }

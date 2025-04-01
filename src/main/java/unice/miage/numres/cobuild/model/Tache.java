@@ -37,7 +37,6 @@ public class Tache extends AbstractBaseEntity {
         joinColumns = @JoinColumn(name = "tache_id"),
         inverseJoinColumns = @JoinColumn(name = "travailleur_id")
     )
-    @JsonIgnore
     private List<Travailleur> travailleurs;
 
     @OneToMany(mappedBy = "tache", cascade = CascadeType.ALL, orphanRemoval = true)

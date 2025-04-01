@@ -18,8 +18,12 @@ public interface TravailleurService {
     // === Navigation et recherche ===
 
     List<Projet> getAvailableProjects();
+    Projet getProjectById(String projectId);
     List<Poste> getOpenPostesInProject(String projectId);
     List<Poste> searchPostesByCompetence(String keyword);
+    List<Poste> searchPostes(String keyword);
+    List<Projet> findProjectsNearAddress(String address, double radiusKm);
+    List<Projet> searchProjectsByKeyword(String keyword);
 
     // === Tâches et participation ===
 

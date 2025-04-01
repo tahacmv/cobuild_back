@@ -40,7 +40,7 @@ public class Poste extends AbstractBaseEntity {
 
     
     @OneToOne
-    @JoinColumn(name = "travailleur_id")
+    @JoinColumn(name = "travailleur_id", unique=false)
     @JsonManagedReference(value = "travailleur-poste")
     private Travailleur travailleur;
 

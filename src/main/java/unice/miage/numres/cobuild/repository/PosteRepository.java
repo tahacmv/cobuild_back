@@ -16,5 +16,8 @@ public interface PosteRepository extends JpaRepository<Poste, String> {
     Optional<Poste> findById(String id);
     List<Poste> findByProjetIdAndTravailleurIsNull(String projectId);
     List<Poste> findByCompetencesRequisesContainingIgnoreCase(String keyword);
-    
+    List<Poste> findByTitreContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+        String titreKeyword,
+        String descriptionKeyword
+    );
 }

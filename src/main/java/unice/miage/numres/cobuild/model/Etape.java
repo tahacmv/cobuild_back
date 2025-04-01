@@ -22,6 +22,8 @@ import unice.miage.numres.cobuild.util.StatutEtape;
 @Table(name = "etapes")
 public class Etape extends AbstractBaseEntity {
 
+    private String nom;
+
     private String description;
 
     @Enumerated(EnumType.STRING)

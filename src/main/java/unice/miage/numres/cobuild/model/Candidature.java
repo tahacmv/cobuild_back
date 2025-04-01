@@ -29,7 +29,6 @@ public class Candidature extends AbstractBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "travailleur_id", nullable = false)
-    @JsonBackReference(value = "travailleur-candidatures")
     private Travailleur travailleur;
 
     @ManyToOne

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface ProjetService {
     // === Project Management ===
     Projet createProject(Projet projet, String username);
@@ -29,15 +31,22 @@ public interface ProjetService {
     Map<String, Long> getTaskStepStatusCount(String taskId); // e.g. {COMMENCEE=1, EN_COURS=2, TERMINEE=3}
     Etape addStepToTask(String taskId, Etape etape, String username);
     List<Etape> getStepsByTask(String taskId, String username);
-    void removeStepFromTask(String stepId, String username);
+    Tache updateTask(String taskId, Tache updatedTask, String username);
+    Etape updateEtape(String etapeId, Etape updated, String username);
 
     // === Poste Management ===
     Poste addPosteToProject(String projectId, Poste poste, String username);
     List<Poste> getPostesByProject(String projectId, String username);
     Projet archiveProject(String projectId, String username);
-
+    Poste updatePoste(String posteId, Poste updated, String username);
 
     // === Collaborator Overview ===
     List<Travailleur> getTravailleursInProject(String projectId, String username);
 
+    // === Uploading Files ===
+    void uploadProjectImage(String username, String projectId, MultipartFile image);
+
+    void deletePoste(String posteId, String username);
+    void deleteTask(String taskId, String username);
+    void deleteStep(String stepId, String username);
 }

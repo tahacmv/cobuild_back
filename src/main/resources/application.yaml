@@ -23,3 +23,8 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
+
+positionstack:
+  api:
+    key: 2a6b633a2e6792455a1ee90e05089510
+    url: http://api.positionstack.com/v1/forward

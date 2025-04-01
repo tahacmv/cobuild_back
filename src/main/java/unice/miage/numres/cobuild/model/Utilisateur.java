@@ -31,7 +31,13 @@ public class Utilisateur extends AbstractBaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private String adresse;
+
     private String password;
+
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "utilisateur_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
