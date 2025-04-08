@@ -1,18 +1,31 @@
 # CoBuild - Spring Boot Backend
 
-## 🚀 Project Overview
-CoBuild is a Spring Boot backend project using **Spring Security**, **JWT authentication**, and **role-based access control (RBAC)**. It supports user authentication and authorization with **ADMIN** and **USER** roles.
+## ⚙️ Backend : Configuration Spring Boot
 
----
+### 1. Prérequis
+- Java 17+
+- Maven
+- MySQL
 
-## 🔧 Setup Instructions
+### 2. Base de données
 
-### 1️⃣ Create `.env.local` for Database Credentials
-Before running the project, you **must** create a `.env.local` file in the **root directory** to store your MySQL credentials.
-
-#### **Create and add the following environment variables in `.env.local`:**
-```ini
-DB_URL=jdbc:mysql://localhost:3306/cobuild?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-DB_USERNAME=your_mysql_user
-DB_PASSWORD=your_mysql_password
+Créer une base de données nommée `cobuild` :
+```sql
+CREATE DATABASE cobuild;
 ```
+
+### 3. Fichier `.env.local` ou `application.properties`
+
+Configurer les identifiants MySQL :
+```
+DB_URL=jdbc:mysql://localhost:3306/cobuild?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=NOM_UTILISATEUR
+DB_PASSWORD=MOT_DE_PASSE
+```
+
+Lancer l'application Spring Boot :
+```bash
+./mvnw spring-boot:run
+```
+
+L'API sera accessible sur : `http://localhost:8080`
